@@ -21,6 +21,6 @@
     "restify": "6.3.4"
   },
   "devDependencies": {
-    "@types/restify": "5.0.6"
+    "@types/restify": "5.0.11"
   }
 }
