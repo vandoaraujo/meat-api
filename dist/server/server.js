@@ -3,7 +3,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const restify = require("restify");
 const environment_1 = require("../common/environment");
 class Server {
-    initRoutes() {
+    initRoutes(routers) {
         return new Promise((resolve, reject) => {
             try {
                 this.application = restify.createServer({
@@ -12,6 +12,9 @@ class Server {
                 });
                 this.application.use(restify.plugins.queryParser());
                 //routes
+                for (let router of routers) {
+                    router.applyRoutes(this.application);
+                }
                 this.application.get('/info', [
                     (req, resp, next) => {
                         if (req.userAgent() && req.userAgent().includes('MSIE 7.0')) {
@@ -47,8 +50,8 @@ class Server {
             }
         });
     }
-    bootstrap() {
-        return this.initRoutes().then(() => this);
+    bootstrap(routers = []) {
+        return this.initRoutes(routers).then(() => this);
     }
 }
 exports.Server = Server;
