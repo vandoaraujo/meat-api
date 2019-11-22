@@ -6,7 +6,7 @@ class UsersRouter extends router_1.Router {
     applyRoutes(application) {
         application.get('/users', (req, resp, next) => {
             //Estamos emulando um metodo findall que usará uma promise pra buscar do 'banco de dados'
-            users_model_1.User.findAll().then(users => {
+            users_model_1.User.find().then(users => {
                 resp.json(users);
                 return next();
             });

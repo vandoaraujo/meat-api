@@ -36,7 +36,7 @@ export class Server {
           (req, resp, next)=>{
             if(req.userAgent() && req.userAgent().includes('MSIE 7.0')){
             //resp.status(400)
-          //  resp.json({message: 'Please, update your browser'})
+            //resp.json({message: 'Please, update your browser'})
             let error: any = new Error()
             error.statusCode = 400
             error.message = 'Please, update your browser'
