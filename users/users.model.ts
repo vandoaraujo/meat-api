@@ -1,5 +1,12 @@
 import * as mongoose from 'mongoose'
 
+//as interfaces criadas sao apenas para um controle estatico, elas nao viram objetos...
+export interface User extends mongoose.Document {
+    name: string,
+    email:string,
+    password: string
+}
+
 const userSchema = new mongoose.Schema({
     name:{
         type: String
@@ -15,7 +22,7 @@ const userSchema = new mongoose.Schema({
 })
 
 //adapta ao documento user o schema de usuario...
-export const User = mongoose.model('User', userSchema)
+export const User = mongoose.model<User>('User', userSchema)
 
 
 // const users = [
