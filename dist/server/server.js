@@ -4,6 +4,7 @@ const restify = require("restify");
 const environment_1 = require("../common/environment");
 const mongoose = require("mongoose");
 const merge_patch_parser_1 = require("./merge-patch.parser");
+const error_handler_1 = require("./error.handler");
 class Server {
     initializeDb() {
         //usamos essa promise por orientação do mongoose.
@@ -23,6 +24,7 @@ class Server {
                 this.application.use(restify.plugins.queryParser());
                 this.application.use(restify.plugins.bodyParser());
                 this.application.use(merge_patch_parser_1.mergePatchBodyParser);
+                this.application.on('restifyError', error_handler_1.handleError);
                 //routes
                 for (let router of routers) {
                     router.applyRoutes(this.application);
