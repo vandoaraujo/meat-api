@@ -1,6 +1,9 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const mongoose = require("mongoose");
+const validators_1 = require("../common/validators");
+const bcryptjs_1 = require("bcryptjs");
+const environment_1 = require("../common/environment");
 const userSchema = new mongoose.Schema({
     name: {
         type: String,
@@ -25,7 +28,41 @@ const userSchema = new mongoose.Schema({
         enum: ['Male', 'Female']
     },
     cpf: {
-        type: String
+        type: String,
+        required: false,
+        validate: {
+            validator: validators_1.validateCPF,
+            message: '{PATH}: Invalid CPF ({VALUE})'
+        }
+    }
+});
+//usar a funcao tradicional no JS porque o 
+//Mongoose nao se adapta a aerofunctions
+//nao atribue um valor personalizado ao this...
+userSchema.pre('save', function (next) {
+    const user = this;
+    if (!user.isModified('password')) {
+        next();
+    }
+    else {
+        bcryptjs_1.hash(user.password, environment_1.environment.security.saltRounds)
+            .then(hash => {
+            user.password = hash;
+            next();
+        }).catch(next);
+    }
+});
+userSchema.pre('findOneAndUpdate', function (next) {
+    const user = this;
+    if (!this.getUpdate().password) {
+        next();
+    }
+    else {
+        bcryptjs_1.hash(this.getUpdate().password, environment_1.environment.security.saltRounds)
+            .then(hash => {
+            this.getUpdate().password = hash;
+            next();
+        }).catch(next);
     }
 });
 //adapta ao documento user o schema de usuario...

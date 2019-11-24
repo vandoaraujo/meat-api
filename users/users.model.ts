@@ -1,4 +1,7 @@
 import * as mongoose from 'mongoose'
+import {validateCPF} from '../common/validators'
+import {hash} from 'bcryptjs'
+import {environment} from '../common/environment'
 
 //as interfaces criadas sao apenas para um controle estatico, elas nao viram objetos...
 export interface User extends mongoose.Document {
@@ -9,7 +12,7 @@ export interface User extends mongoose.Document {
 
 const userSchema = new mongoose.Schema({
     name:{
-        type: String,
+        type: String,   
         required: true,
         maxlength: 80,
         minlength: 3
@@ -32,7 +35,41 @@ const userSchema = new mongoose.Schema({
         enum: ['Male', 'Female']
     },
     cpf:{
-        type: String
+        type: String,
+        required: false,
+        validate: {
+            validator: validateCPF,
+            message: '{PATH}: Invalid CPF ({VALUE})'
+        } 
+    }
+})
+
+//usar a funcao tradicional no JS porque o 
+//Mongoose nao se adapta a aerofunctions
+//nao atribue um valor personalizado ao this...
+userSchema.pre('save', function (next){
+    const user: User = this
+    if(!user.isModified('password')){
+        next()
+    }else{
+        hash(user.password, environment.security.saltRounds)
+        .then(hash=>{
+            user.password = hash
+            next()
+        }).catch(next)
+    }
+})
+
+userSchema.pre('findOneAndUpdate', function (next){
+    const user: User = this
+    if(!this.getUpdate().password){
+        next()
+    }else{
+        hash(this.getUpdate().password, environment.security.saltRounds)
+        .then(hash=>{
+            this.getUpdate().password = hash
+            next()
+        }).catch(next)
     }
 })
 
