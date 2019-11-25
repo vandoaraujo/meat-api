@@ -41,7 +41,8 @@ class RestaurantsRouter extends model_router_1.ModelRouter {
         application.put('/restaurants/:id', [this.validateId, this.replace]);
         application.patch('/restaurants/:id', [this.validateId, this.update]);
         application.del('/restaurants/:id', [this.validateId, this.delete]);
-        application.get('/restaurants/:id', [this.validateId, this.findMenu]);
+        application.get('/restaurants/:id/menu', [this.validateId, this.findMenu]);
+        application.get('/restaurants/:id/menu', [this.validateId, this.replaceMenu]);
     }
 }
 exports.restaurantsRouter = new RestaurantsRouter();
