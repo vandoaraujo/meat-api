@@ -1,12 +1,12 @@
-import {Router} from '../common/router'
+import {ModelRouter} from '../common/model-router'
 import * as restify from 'restify'
 import {NotFoundError} from 'restify-errors'
 import {User} from '../users/users.model'
 
-class UsersRouter extends Router {
+class UsersRouter extends ModelRouter<User> {
 
     constructor(){
-        super()
+        super(User)
         this.on('beforeRender', document=>{
             document.password = undefined
         })
@@ -14,18 +14,9 @@ class UsersRouter extends Router {
     
     applyRoutes(application : restify.Server){
 
-        application.get('/users', (req, resp, next) =>{
-            //Estamos emulando um metodo findall que usará uma promise pra buscar do 'banco de dados'
-            User.find()
-                .then(this.render(resp, next))
-                .catch(next)
-        })
+        application.get('/users', this.findAll)
 
-        application.get('users/:id', (req, resp, next) => {
-            User.findById(req.params.id)
-                .then(this.render(resp,next))
-                .catch(next)
-        })
+        application.get('users/:id', this.findById)
 
         application.post('/users', (req, resp, next) => {
             let user = new User(req.body);

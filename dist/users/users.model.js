@@ -36,35 +36,37 @@ const userSchema = new mongoose.Schema({
         }
     }
 });
+const hashPassword = (obj, next) => {
+    bcryptjs_1.hash(obj.password, environment_1.environment.security.saltRounds)
+        .then(hash => {
+        obj.password = hash;
+        next();
+    }).catch(next);
+};
 //usar a funcao tradicional no JS porque o 
 //Mongoose nao se adapta a aerofunctions
 //nao atribue um valor personalizado ao this...
-userSchema.pre('save', function (next) {
+const saveMiddleware = function (next) {
     const user = this;
     if (!user.isModified('password')) {
         next();
     }
     else {
-        bcryptjs_1.hash(user.password, environment_1.environment.security.saltRounds)
-            .then(hash => {
-            user.password = hash;
-            next();
-        }).catch(next);
+        hashPassword(user, next);
     }
-});
-userSchema.pre('findOneAndUpdate', function (next) {
+};
+const updateMiddleware = function (next) {
     const user = this;
     if (!this.getUpdate().password) {
         next();
     }
     else {
-        bcryptjs_1.hash(this.getUpdate().password, environment_1.environment.security.saltRounds)
-            .then(hash => {
-            this.getUpdate().password = hash;
-            next();
-        }).catch(next);
+        hashPassword(this.getUpdate, next);
     }
-});
+};
+userSchema.pre('save', saveMiddleware);
+userSchema.pre('findOneAndUpdate', updateMiddleware);
+userSchema.pre('findOneAndUpdate', updateMiddleware);
 //adapta ao documento user o schema de usuario...
 exports.User = mongoose.model('User', userSchema);
 // const users = [
