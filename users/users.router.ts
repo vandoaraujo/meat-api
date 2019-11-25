@@ -15,50 +15,14 @@ class UsersRouter extends ModelRouter<User> {
     applyRoutes(application : restify.Server){
 
         application.get('/users', this.findAll)
-
-        application.get('users/:id', this.findById)
-
-        application.post('/users', (req, resp, next) => {
-            let user = new User(req.body);
-            user.save()
-                .then(this.render(resp, next))
-                .catch(next)
-        })
-
-        application.put('/users/:id', (req, resp, next)=>{
-            //faz um overwrite completo no objeto...
-            const options = {runValidators: true, overwrite: true}
-            User.update({_id:req.params.id}, req.body, options)
-                .exec().then(result=>{
-                    if(result.n){
-                        //obtem o recurso atualizado e retorna no then abaixo
-                        return User.findById(req.params.id).exec()
-                    }else{
-                        throw new NotFoundError('Documento não encontrado')
-                    }
-                }).then(this.render(resp,next))
-                  .catch(next)
-        })
-
-        application.patch('/users/:id', (req, resp, next)=>{
-            const options = {runValidators: true, new : true}
-            User.findByIdAndUpdate(req.params.id, req.body, options)
-                .then(this.render(resp,next))
-                .catch(next)
-        })
-
-        application.del('/users/:id', (req, resp, next)=>{
-            User.remove({_id:req.params.id}).exec().then((cmdResult: any)=>{
-              if(cmdResult.result.n){
-                resp.send(204)          
-              }else{
-                throw new NotFoundError('Documento não encontrado')
-              }
-              return next()
-            }).catch(next)
-          })
-
-          application.get('/info', [
+        //Podemos validar o Id passando um array, no primeiro parametro valido o ID.
+        //passando a validação do ID, chama a funcao next e executa o metodo de busca findById
+        application.get('users/:id', [this.validateId, this.findById])
+        application.post('/users', this.save)
+        application.put('/users/:id', [this.validateId, this.replace])
+        application.patch('/users/:id', [this.validateId, this.update])
+        application.del('/users/:id', [this.validateId, this.delete])
+        application.get('/info', [
             (req, resp, next)=>{
               if(req.userAgent() && req.userAgent().includes('MSIE 7.0')){
               //resp.status(400)
