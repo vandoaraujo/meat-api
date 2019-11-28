@@ -5,6 +5,7 @@ import {NotFoundError} from 'restify-errors'
 export abstract class ModelRouter<D extends mongoose.Document> extends Router {
     
     basePath: string
+    pageSize: number = 4
     
     constructor(protected model: mongoose.Model<D>){
         super()
@@ -21,6 +22,22 @@ export abstract class ModelRouter<D extends mongoose.Document> extends Router {
         return resource
     }
 
+    envelopeAll(documents : any[], options: any = {}): any {
+        const resource: any = {
+            _links:{
+                self: ``
+            },
+            items: documents
+        }
+        if(options.page){
+            if(options.page > 1){
+                resource._links.previous = `${this.basePath}?_page=${options.page-1}`
+            }
+            resource._links.next = `${this.basePath}?_page=${options.page+1}`
+        }
+        return resource
+    }
+
     validateId = (req, res, next)=>{
         if(!mongoose.Types.ObjectId.isValid(req.params.id)){
             next(new NotFoundError('Document not found'))
@@ -31,8 +48,14 @@ export abstract class ModelRouter<D extends mongoose.Document> extends Router {
 
     findAll = (req, resp, next) =>{
         //Estamos emulando um metodo findall que usará uma promise pra buscar do 'banco de dados'
+        let page = parseInt(req.query._page || 1)
+        page = page > 0 ? page : 1
+        const skip = (page - 1) * this.pageSize 
+
         this.model.find()
-            .then(this.renderAll(resp, next))
+            .skip(skip)
+            .limit(this.pageSize)
+            .then(this.renderAll(resp, next, {page}))
             .catch(next)
     }
 
