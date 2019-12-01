@@ -9,11 +9,12 @@ class UsersRouter extends model_router_1.ModelRouter {
             if (req.query.email) {
                 users_model_1.User.findByEmail(req.query.email)
                     .then(user => user ? [user] : [])
-                    .then(this.renderAll(resp, next))
+                    .then(this.renderAll(resp, next, { pageSize: this.pageSize, url: req.url }))
                     .catch(next);
             }
             else {
-                next();
+                //avisamos o restify que ja estamos renderizando a resposta e nao queremos mais callback
+                next(false);
             }
         };
         this.on('beforeRender', document => {
