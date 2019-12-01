@@ -4,7 +4,7 @@
   "description": "api node js",
   "main": "index.js",
   "scripts": {
-    "test": "jest"
+    "test": "ts-node jest.startup.ts"
   },
   "repository": {
     "type": "git",
@@ -14,6 +14,10 @@
   "author": "",
   "license": "ISC",
   "jest": {
+    "verbose": true,
+    "globals": {
+      "address": "http://localhost:3001"
+    },
     "testEnvironment": "node",
     "transform": {
       "^.+\\.tsx?$": "ts-jest"
@@ -46,8 +50,10 @@
     "@types/restify-errors": "4.3.2",
     "@types/supertest": "2.0.4",
     "jest": "22.4.2",
+    "jest-cli": "22.4.2",
     "supertest": "3.0.0",
     "ts-jest": "22.0.4",
+    "ts-node": "5.0.1",
     "typescript": "2.6.2"
   }
 }

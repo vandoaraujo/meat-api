@@ -15,7 +15,6 @@ class RestaurantsRouter extends ModelRouter<Restaurant> {
         return resource
     }
 
-
     replaceMenu = (req, resp, next) => {
         Restaurant.findById(req.params.id)
           .then( rest => {
@@ -30,6 +29,7 @@ class RestaurantsRouter extends ModelRouter<Restaurant> {
             return next()
         }).catch(next)
     }
+
     findMenu = (req, resp, next) => {
         Restaurant.findById(req.params.id, "+menu" )
           .then( rest => {
