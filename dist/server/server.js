@@ -5,6 +5,7 @@ const environment_1 = require("../common/environment");
 const mongoose = require("mongoose");
 const merge_patch_parser_1 = require("./merge-patch.parser");
 const error_handler_1 = require("./error.handler");
+const token_parser_1 = require("../security/token.parser");
 class Server {
     initializeDb() {
         //usamos essa promise por orientação do mongoose.
@@ -24,6 +25,7 @@ class Server {
                 this.application.use(restify.plugins.queryParser());
                 this.application.use(restify.plugins.bodyParser());
                 this.application.use(merge_patch_parser_1.mergePatchBodyParser);
+                this.application.use(token_parser_1.tokenParser);
                 this.application.on('restifyError', error_handler_1.handleError);
                 //routes
                 for (let router of routers) {
