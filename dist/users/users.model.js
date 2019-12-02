@@ -2,7 +2,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 const mongoose = require("mongoose");
 const validators_1 = require("../common/validators");
-const bcryptjs_1 = require("bcryptjs");
+const hash = require("bcryptjs");
 const environment_1 = require("../common/environment");
 const userSchema = new mongoose.Schema({
     name: {
@@ -36,11 +36,14 @@ const userSchema = new mongoose.Schema({
         }
     }
 });
-userSchema.statics.findByEmail = function (email) {
-    return this.findOne({ email });
+userSchema.statics.findByEmail = function (email, projection) {
+    return this.findOne({ email }, projection);
+};
+userSchema.methods.matches = function (password) {
+    return hash.compareSync(password, this.password);
 };
 const hashPassword = (obj, next) => {
-    bcryptjs_1.hash(obj.password, environment_1.environment.security.saltRounds)
+    hash(obj.password, environment_1.environment.security.saltRounds)
         .then(hash => {
         obj.password = hash;
         next();
