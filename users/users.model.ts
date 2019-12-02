@@ -58,7 +58,7 @@ userSchema.methods.matches = function(password: string): boolean {
 }
 
 const hashPassword = (obj, next)=>{
-    hash(obj.password, environment.security.saltRounds)
+    hash.hash(obj.password, environment.security.saltRounds)
     .then(hash=>{
         obj.password = hash
         next()

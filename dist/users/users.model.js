@@ -43,7 +43,7 @@ userSchema.methods.matches = function (password) {
     return hash.compareSync(password, this.password);
 };
 const hashPassword = (obj, next) => {
-    hash(obj.password, environment_1.environment.security.saltRounds)
+    hash.hash(obj.password, environment_1.environment.security.saltRounds)
         .then(hash => {
         obj.password = hash;
         next();
