@@ -7,8 +7,8 @@ class ModelRouter extends router_1.Router {
     constructor(model) {
         super();
         this.model = model;
-        this.pageSize = 4;
-        this.validateId = (req, res, next) => {
+        this.pageSize = 2;
+        this.validateId = (req, resp, next) => {
             if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
                 next(new restify_errors_1.NotFoundError('Document not found'));
             }
@@ -17,11 +17,11 @@ class ModelRouter extends router_1.Router {
             }
         };
         this.findAll = (req, resp, next) => {
-            //Estamos emulando um metodo findall que usará uma promise pra buscar do 'banco de dados'
             let page = parseInt(req.query._page || 1);
             page = page > 0 ? page : 1;
             const skip = (page - 1) * this.pageSize;
-            this.model.count({}).exec()
+            this.model
+                .count({}).exec()
                 .then(count => this.model.find()
                 .skip(skip)
                 .limit(this.pageSize)
@@ -42,13 +42,11 @@ class ModelRouter extends router_1.Router {
                 .catch(next);
         };
         this.replace = (req, resp, next) => {
-            //faz um overwrite completo no objeto...
             const options = { runValidators: true, overwrite: true };
             this.model.update({ _id: req.params.id }, req.body, options)
                 .exec().then(result => {
                 if (result.n) {
-                    //obtem o recurso atualizado e retorna no then abaixo
-                    return this.model.findById(req.params.id).exec();
+                    return this.prepareOne(this.model.findById(req.params.id));
                 }
                 else {
                     throw new restify_errors_1.NotFoundError('Documento não encontrado');
