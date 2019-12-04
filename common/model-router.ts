@@ -80,19 +80,19 @@ export abstract class ModelRouter<D extends mongoose.Document> extends Router {
         .then(this.render(resp, next))
         .catch(next)
   }
-
+  //2.6.2 isso é um galho com a versão do TS...se usar a versao 2.6.2 funciion
+  //Coloquei o <any> pra tirar o erro
   replace = (req, resp, next)=>{
     const options = {runValidators: true, overwrite: true}
-    //REVER ESSE CODIGO...
-    // this.model.update({_id: req.params.id}, req.body, options)
-    //     .exec().then(result=>{
-    //   if(result.n){
-    //     return this.prepareOne(this.model.findById(req.params.id))
-    //   } else{
-    //     throw new NotFoundError('Documento não encontrado')
-    //   }
-    // }).then(this.render(resp, next))
-    //   .catch(next)
+    this.model.update({_id: req.params.id}, req.body, options)
+        .exec().then(result=>{
+      if(result.n){
+        return <any> this.prepareOne( this.model.findById(req.params.id))
+      } else{
+        throw new NotFoundError('Documento não encontrado')
+      }
+    }).then(this.render(resp, next))
+      .catch(next)
   }
 
   update = (req, resp, next)=>{
