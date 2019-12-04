@@ -4,6 +4,7 @@ import * as restify from 'restify'
 import {environment} from '../common/environment'
 import {Router} from '../common/router'
 import * as mongoose from 'mongoose'
+import {logger} from '../common/logger'
 import {mergePatchBodyParser} from './merge-patch.parser'
 import {handleError} from './error.handler'
 import {tokenParser} from '../security/token.parser'
@@ -28,6 +29,7 @@ export class Server {
         const options: restify.ServerOptions = {
           name: 'meat-api',
           version: '1.0.0',
+          log: logger
         }
 
         if(environment.security.enableHTTPS){
@@ -37,12 +39,14 @@ export class Server {
 
         this.application = restify.createServer(options)
 
+        this.application.pre(restify.plugins.requestLogger({
+          log: logger
+        }))
+
         this.application.use(restify.plugins.queryParser())
         this.application.use(restify.plugins.bodyParser())
         this.application.use(mergePatchBodyParser)
         this.application.use(tokenParser)
-
-        this.application.on('restifyError', handleError)
 
         //routes
         for (let router of routers) {
@@ -52,6 +56,17 @@ export class Server {
         this.application.listen(environment.server.port, ()=>{
            resolve(this.application)
         })
+
+        this.application.on('restifyError', handleError)
+        // this.application.on('after', restify.plugins.auditLogger({
+        //   log: logger,
+        //   event: 'after',
+        //   server: this.application  
+        // }))
+
+        // this.application.on('audit', data=>{
+
+        // })
 
       }catch(error){
         reject(error)
