@@ -35,7 +35,7 @@ Abraços.
             else {
                 throw new restify_errors_1.NotFoundError('Documento não encontrado');
             }
-            return next();
+            return next(false);
         };
     }
     renderAll(response, next, options = {}) {
@@ -50,7 +50,7 @@ Abraços.
             else {
                 response.json(this.envelopeAll([]));
             }
-            return next();
+            return next(false);
         };
     }
 }

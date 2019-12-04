@@ -38,7 +38,7 @@ Abraços.
             }else{
                 throw new NotFoundError('Documento não encontrado') 
             }
-            return next()   
+            return next(false)   
         }
     }
 
@@ -53,7 +53,7 @@ Abraços.
             }else{
                 response.json(this.envelopeAll([]))
             }
-            return next()
+            return next(false)
         }
     }
 }

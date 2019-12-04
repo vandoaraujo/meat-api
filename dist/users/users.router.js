@@ -16,7 +16,7 @@ class UsersRouter extends model_router_1.ModelRouter {
             }
             else {
                 //avisamos o restify que ja estamos renderizando a resposta e nao queremos mais callback
-                next(false);
+                next();
             }
         };
         this.on('beforeRender', document => {
@@ -37,15 +37,16 @@ class UsersRouter extends model_router_1.ModelRouter {
         // application.patch(`${this.basePath}/:id`, [this.validateId, this.update])
         // application.del(`${this.basePath}/:id`, [this.validateId, this.delete])
         // application.post(`${this.basePath}/authenticate`, authenticate)
+        application.get({ path: `${this.basePath}`, version: '2.0.0' }, [authz_handler_1.authorize('admin'), this.findByEmail, this.findAll]);
         application.get({ path: `${this.basePath}`, version: '1.0.0' }, [authz_handler_1.authorize('admin'), this.findAll]);
-        application.get(`${this.basePath}`, [
-            authz_handler_1.authorize('admin'),
-            this.findByEmail,
-            this.findAll
-        ]);
+        // application.get(`${this.basePath}`, [
+        //   authorize('admin'),
+        //   this.findByEmail,
+        //   this.findAll
+        // ])
         application.get(`${this.basePath}/:id`, [authz_handler_1.authorize('admin'), this.validateId, this.findById]);
         application.post(`${this.basePath}`, this.save);
-        application.put(`${this.basePath}/:id`, [authz_handler_1.authorize('admin', 'user'), this.validateId, this.replace]);
+        application.put(`${this.basePath}/:id`, [this.validateId, this.replace]);
         application.patch(`${this.basePath}/:id`, [authz_handler_1.authorize('admin'), this.validateId, this.update]);
         application.del(`${this.basePath}/:id`, [authz_handler_1.authorize('admin'), this.validateId, this.delete]);
         application.post(`${this.basePath}/authenticate`, auth_handler_1.authenticate);
