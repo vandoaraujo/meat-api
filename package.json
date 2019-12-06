@@ -39,10 +39,12 @@
   "homepage": "https://github.com/vandoaraujo/meat-api#readme",
   "dependencies": {
     "@types/bcryptjs": "^2.4.2",
+    "@types/restify-cors-middleware": "1.0.1",
     "bcryptjs": "^2.4.3",
     "jsonwebtoken": "8.1.1",
     "mongoose": "4.13.9",
     "restify": "6.3.4",
+    "restify-cors-middleware": "1.1.0",
     "restify-errors": "5.0.0"
   },
   "devDependencies": {
