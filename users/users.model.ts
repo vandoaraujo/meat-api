@@ -51,7 +51,7 @@ const userSchema = new mongoose.Schema({
             message: '{PATH}: Invalid CPF ({VALUE})'
         } 
     },
-    profiles :{
+    profiles:{
         type: [String],
         required: false
     }
